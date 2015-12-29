@@ -40,14 +40,14 @@ public class Main extends SimpleApplication implements ActionListener{
   }
  
   private void setUpLight() {
-    lamp1 = new FlyingLight(new Vector3f(0,6,0),18,2f);    
-    lamp2 = new FlyingLight(new Vector3f(0,6,0),18,2.2f);
-    viewPort.setBackgroundColor(new ColorRGBA(0.7f, 0.8f, 1f, 1f));
+    lamp1 = new FlyingLight(new Vector3f(0,6,0),19,2f);    
+    lamp2 = new FlyingLight(new Vector3f(0,6,0),19,2.2f);
+    viewPort.setBackgroundColor(new ColorRGBA(.2f, .2f, .2f, 1f));
     // We add light so we see the scene
-    /*AmbientLight al = new AmbientLight();
-    al.setColor(ColorRGBA.DarkGray.mult(0.1f));
+    AmbientLight al = new AmbientLight();
+    al.setColor(ColorRGBA.DarkGray);
     rootNode.addLight(al);
- */
+ 
    /* DirectionalLight dl = new DirectionalLight();
     dl.setColor(ColorRGBA.DarkGray.mult(0.1f));
     dl.setDirection(new Vector3f(2.8f, -2.8f, -2.8f).normalizeLocal());
@@ -128,7 +128,7 @@ public class Main extends SimpleApplication implements ActionListener{
 
         CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1f, 1.2f, 1);
         player = new CharacterControl(capsuleShape, 0.05f);
-        player.setPhysicsLocation(new Vector3f(0, 3, 0));
+        player.setPhysicsLocation(new Vector3f(12, 3, 12));
         player.setJumpSpeed(0f);
         bulletAppState.getPhysicsSpace().add(player);
     }
