@@ -19,7 +19,7 @@ public class BlockTriangleFieldHelper{
     mat.setBoolean("UseMaterialColors",true);  // Set some parameters, e.g. blue.
     mat.setColor("Ambient", color);   // ... color of this object
     mat.setColor("Diffuse", ColorRGBA.White);   // ... color of light being reflected
-    mat.setColor("Specular", ColorRGBA.Yellow);
+    mat.setColor("Specular", ColorRGBA.White);
     mat.setBoolean("VertexLighting", true);
     return mat;
   } 

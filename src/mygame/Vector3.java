@@ -1,16 +1,20 @@
 package mygame;
 public class Vector3
 {
-        int x;
-        int y;
-        int z;
+        public int x;
+        public int y;
+        public int z;
     public Vector3()
 	{
 		this.x = 0;
 		this.y = 0;
 		this.z = 0;
 	}
-
+   public Vector3(Vector3 other){
+     this.x = other.x;
+     this.y = other.y;
+     this.z = other.z;
+   }
 	public Vector3(int x, int y, int z)
 	{
 		this.x = x;
