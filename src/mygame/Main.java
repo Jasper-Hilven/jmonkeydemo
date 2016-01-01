@@ -1,6 +1,7 @@
 package mygame;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.state.ScreenshotAppState;
 import com.jme3.bullet.BulletAppState;
 import com.jme3.bullet.collision.shapes.CapsuleCollisionShape;
 import com.jme3.bullet.control.CharacterControl;
@@ -8,8 +9,6 @@ import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.light.AmbientLight;
-import com.jme3.light.DirectionalLight;
-import com.jme3.light.PointLight;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
 
@@ -24,7 +23,7 @@ public class Main extends SimpleApplication implements ActionListener{
   private Vector3f camLeft = new Vector3f();
  private FlyingLight lamp1;
   private FlyingLight lamp2;
-
+  private ScreenshotAppState screenShotState;
   public static void main(String[] args) {
     Main app = new Main();
     app.start();
@@ -37,6 +36,9 @@ public class Main extends SimpleApplication implements ActionListener{
     setUpLight();
     (new LevelBuilder()).setUpLevel(rootNode, assetManager, bulletAppState);
     setUpPlayer();
+    screenShotState = new ScreenshotAppState();
+    screenShotState.setFilePath("C:/file.png");
+    this.stateManager.attach(screenShotState);
   }
  
   private void setUpLight() {
@@ -97,10 +99,11 @@ public class Main extends SimpleApplication implements ActionListener{
     }
   }
  
-  
+int updateCount = 0;  
   @Override
     public void simpleUpdate(float tpf) {
-        camDir.set(cam.getDirection()).multLocal(0.6f);
+      updateCount ++;
+      camDir.set(cam.getDirection()).multLocal(0.6f);
         camLeft.set(cam.getLeft()).multLocal(0.4f);
         walkDirection.set(0, 0, 0);
         if (left) {
@@ -120,6 +123,7 @@ public class Main extends SimpleApplication implements ActionListener{
         walkDirection.divideLocal(6f);
         player.setWalkDirection(walkDirection);
         cam.setLocation(player.getPhysicsLocation());
+        cam.setFrustumNear(0.7f);
         lamp1.Update(tpf);
         lamp2.Update(tpf);
   }
@@ -128,8 +132,8 @@ public class Main extends SimpleApplication implements ActionListener{
 
         CapsuleCollisionShape capsuleShape = new CapsuleCollisionShape(1f, 1.2f, 1);
         player = new CharacterControl(capsuleShape, 0.05f);
-        player.setPhysicsLocation(new Vector3f(12, 3, 12));
-        player.setJumpSpeed(0f);
+        player.setPhysicsLocation(new Vector3f(5, 3, 5));
+        player.setJumpSpeed(0f); 
         bulletAppState.getPhysicsSpace().add(player);
     }
 }

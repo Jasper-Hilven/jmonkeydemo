@@ -17,32 +17,32 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
 
 public class SingleBlockTriangleField implements BlockTriangleField{
-    private Set<TriangleBlock> blocks;
+    private HashMap<Vector3, TriangleBlock> positionToBlock;
     private Node attachPoint;
     private boolean active;
-    private Material mat ;
+    private Material mat;
     private PhysicsSpace physics;
     private RigidBodyControl latestPhysicsControl;
     private Geometry latestBlocks;
     public SingleBlockTriangleField(AssetManager assetManager, PhysicsSpace physics){
       this.mat = BlockTriangleFieldHelper.getVertexColoredBlockMaterial(assetManager, ColorRGBA.Yellow);
       this.physics = physics;
-      blocks = new HashSet<TriangleBlock>();
+      positionToBlock = new HashMap<Vector3, TriangleBlock>();
       attachPoint = new Node();
     }
+    
     public Mesh getMeshFromPositions(){
       Mesh mesh = new Mesh();
-      int nbBlocks = blocks.size();
-      Vector3f[] vertices = new Vector3f[nbBlocks*18];
-      Vector3f[] normals = new Vector3f[nbBlocks*18];
-      Vector4f[] colors = new Vector4f[nbBlocks*18];
-      int[] indices = new int[nbBlocks*24];
+      int nbBlocks = positionToBlock.size();
+      Vector3f[] vertices = new Vector3f[nbBlocks * 18];
+      Vector3f[] normals = new Vector3f[nbBlocks * 18];
+      Vector4f[] colors = new Vector4f[nbBlocks * 18];
+      int[] indices = new int[nbBlocks * 24];
       int count = 0;
-      for(TriangleBlock triangleBlock: blocks){
+      for(TriangleBlock triangleBlock: positionToBlock.values()){
           
         putSingleBlockMeshInFieldMesh(triangleBlock,count,vertices,normals,colors,indices);
         count++;
@@ -204,16 +204,24 @@ public class SingleBlockTriangleField implements BlockTriangleField{
       if(active)
           replaceLatestMesh();
     }
-      public void setBlock(TriangleBlock position){
-      if(blocks.contains(position))
-          return;
-        blocks.add(position);
-      if(active)
-        replaceLatestMesh();
+    public void setBlock(TriangleBlock block){
+        if(positionToBlock.containsKey(block.getPosition()))
+            return;
+        positionToBlock.put(block.getPosition(), block);
+        if(active)
+            replaceLatestMesh();
     }
 
     public Spatial getField() {
-      return attachPoint;
+        return attachPoint;
+    }
+
+    public void removeBlock(Vector3 position) {
+        if(!positionToBlock.containsKey(position))
+            return;
+        positionToBlock.remove(position);
+        if(active)
+            replaceLatestMesh();
     }
 
     

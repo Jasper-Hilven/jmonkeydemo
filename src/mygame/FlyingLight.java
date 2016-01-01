@@ -18,8 +18,8 @@ class FlyingLight{
       this.radius = radius;
     this.circularPosition = circularPosition;
       lamp_light = new PointLight();
-    lamp_light.setColor(ColorRGBA.Orange);
-    lamp_light.setRadius(40f);
+  lamp_light.setColor(ColorRGBA.White);
+  lamp_light.setRadius(40f);
     lamp_light.setPosition(circularPosition.add(new Vector3f(radius,0,0)));
   }
   
