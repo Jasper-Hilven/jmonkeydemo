@@ -17,11 +17,13 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.control.Control;
 import com.jme3.util.BufferUtils;
 import java.util.HashMap;
+import javax.vecmath.Matrix3d;
+import mygame.TurningBlockController;
 import mygame.math.Vector3;
 
 public class MultiBlockTriangleField implements BlockTriangleField {
 
-    private HashMap<Vector3, Geometry> blocks;
+    private HashMap<Vector3, Spatial> blocks;
     private Node field;
     private Mesh singleBlockMesh;
     private Material blueBlockMaterial;
@@ -33,7 +35,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
     }
 
     public MultiBlockTriangleField(AssetManager assetManager, PhysicsSpace physics) {
-        blocks = new HashMap<Vector3, Geometry>();
+        blocks = new HashMap<Vector3, Spatial>();
         field = new Node();
         field.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         setSingleBlockMesh();
@@ -47,12 +49,11 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         float basicRotation = FastMath.PI / 2f;
         float resize = (float) Math.sqrt(1d / 3d);
         float x0 = FastMath.cos(basicRotation + (FastMath.PI * 0f) / 3f);
-
-        float z0 = FastMath.sin(basicRotation + (FastMath.PI * 0f) / 3f) + 0.5f;
+        float z0 = FastMath.sin(basicRotation + (FastMath.PI * 0f) / 3f);
         float x1 = FastMath.cos(basicRotation + (FastMath.PI * 2f) / 3f);
-        float z1 = FastMath.sin(basicRotation + (FastMath.PI * 2f) / 3f) + 0.5f;
+        float z1 = FastMath.sin(basicRotation + (FastMath.PI * 2f) / 3f);
         float x2 = FastMath.cos(basicRotation + (FastMath.PI * 4f) / 3f);
-        float z2 = FastMath.sin(basicRotation + (FastMath.PI * 4f) / 3f) + 0.5f;
+        float z2 = FastMath.sin(basicRotation + (FastMath.PI * 4f) / 3f);
         float y0 = 0;
         float y1 = 1f / resize;
         Vector3f[] vertices = new Vector3f[18];
@@ -139,7 +140,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         if (!position.isPositive()) {
             throw new Error();
         }
-        Geometry block = blocks.get(position);
+        Spatial block = blocks.get(position);
         if (block == null) {
             return;
         }
@@ -148,22 +149,31 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         removePhysics(block);
     }
 
-    public void setExistingBlock(Vector3 position, Spatial block){
-        if(block.getParent() != null)
+    public void setExistingBlock(Vector3 position, Spatial block) {
+        if (block.getParent() != null) {
             throw new Error();
+        }
+
+        if (blocks.get(position) != null) {
+            throw new Error();
+        }
+
+        blocks.put(position, block);
         field.attachChild(block);
         RigidBodyControl physicsBlock = block.getControl(RigidBodyControl.class);
-        if(physicsBlock.getMass() != 0)
-          physicsBlock.setMass(0f);
+        if (physicsBlock.getMass() != 0) {
+            physicsBlock.setMass(0f);
+        }
     }
-    
-    public Spatial takeBlock(Vector3 position){
-      Geometry block = blocks.get(position);
-      if(block == null)
-          return null;
-      blocks.remove(position);
-      field.detachChild(block);
-      return block;
+
+    public Spatial takeBlock(Vector3 position) {
+        Spatial block = blocks.get(position);
+        if (block == null) {
+            return null;
+        }
+        blocks.remove(position);
+        field.detachChild(block);
+        return block;
     }
     
     public void setActive(boolean active) {
@@ -174,7 +184,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         if (!position.isPositive()) {
             throw new Error();
         }
-        Geometry block = blocks.get(position);
+        Spatial block = blocks.get(position);
         if (block != null) {
             return;
         }
@@ -184,29 +194,21 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         field.attachChild(block);
         blocks.put(position, block);
         AddPhysics(block);
+        //block.addControl(new TurningBlockController());
     }
 
-    
-    private void PutBlockInPlace(Vector3 position, Geometry geo) {
-        int x = position.x();
-        int y = position.y();
-        int z = position.z();
-        float unEvenTranslation = ((float) Math.sqrt(3)) * 0.5f;
-        boolean unEven = !position.isEvenXZ();
-        Vector3f localTranslation = new Vector3f(x * 0.5f, 2 + y, unEvenTranslation * z + (unEven ? unEvenTranslation : 0));
-        geo.setLocalTranslation(localTranslation);
-        Quaternion roll180 = new Quaternion();
-        roll180.fromAngleAxis(unEven ? FastMath.PI : 0, new Vector3f(0, 1, 0));
-        geo.setLocalRotation(roll180);
+    private void PutBlockInPlace(Vector3 position, Spatial geo) {
+        geo.setLocalTranslation(BlockTriangleFieldHelper.getWorldPosition(position));
+        geo.setLocalRotation(BlockTriangleFieldHelper.getWorldRotation(position));
     }
 
-    private void AddPhysics(Geometry block) {
+    private void AddPhysics(Spatial block) {
         RigidBodyControl physicsBlock = new RigidBodyControl(0f);
         block.addControl(physicsBlock);
         world.add(physicsBlock);
     }
 
-    private void removePhysics(Geometry block) {
+    private void removePhysics(Spatial block) {
         Control physicsBlock = block.getControl(RigidBodyControl.class);
         if (physicsBlock == null) {
             return;
@@ -215,7 +217,6 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         world.remove(physicsBlock);
     }
 
-    
     private Geometry GetSingleBlock(boolean red, String name) {
         Geometry geo = new Geometry(name, singleBlockMesh);
         geo.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);

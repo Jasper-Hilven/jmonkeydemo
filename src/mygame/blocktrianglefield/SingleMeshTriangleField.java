@@ -20,7 +20,7 @@ import com.jme3.util.BufferUtils;
 import java.util.HashMap;
 import mygame.math.Vector3;
 
-public class SingleBlockTriangleField implements BlockTriangleField {
+public class SingleMeshTriangleField implements BlockTriangleField {
 
     private HashMap<Vector3, TriangleBlock> positionToBlock;
     private Node attachPoint;
@@ -30,7 +30,7 @@ public class SingleBlockTriangleField implements BlockTriangleField {
     private RigidBodyControl latestPhysicsControl;
     private Geometry latestBlocks;
 
-    public SingleBlockTriangleField(AssetManager assetManager, PhysicsSpace physics) {
+    public SingleMeshTriangleField(AssetManager assetManager, PhysicsSpace physics) {
         this.mat = BlockTriangleFieldHelper.getVertexColoredBlockMaterial(assetManager, ColorRGBA.Yellow);
         this.physics = physics;
         positionToBlock = new HashMap<Vector3, TriangleBlock>();
@@ -46,7 +46,6 @@ public class SingleBlockTriangleField implements BlockTriangleField {
         int[] indices = new int[nbBlocks * 24];
         int count = 0;
         for (TriangleBlock triangleBlock : positionToBlock.values()) {
-
             putSingleBlockMeshInFieldMesh(triangleBlock, count, vertices, normals, colors, indices);
             count++;
         }
@@ -66,6 +65,7 @@ public class SingleBlockTriangleField implements BlockTriangleField {
         if (latestBlocks != null) {
             attachPoint.detachChild(latestBlocks);
         }
+        ret.setLocalTranslation(0, 0, 0.5f/ FastMath.sqrt(3));
         attachPoint.attachChild(ret);
         CollisionShape sceneShape = CollisionShapeFactory.createMeshShape(ret);
         RigidBodyControl blocksphysic = new RigidBodyControl(sceneShape, 0f);
@@ -87,12 +87,11 @@ public class SingleBlockTriangleField implements BlockTriangleField {
         Vector3 position = triangleBlock.getPosition();
         Vector4f color = triangleBlock.getColor();
 
-        boolean unEven = !position.isEven();
+        boolean unEven = !position.isEvenXZ();
         float unEvenTranslation = ((float) Math.sqrt(3)) * 0.5f;
-        Vector3f localTranslation = new Vector3f(position.x() * 0.5f, 2 + position.y(), unEvenTranslation * position.z() + (unEven ? unEvenTranslation : 0));
+        Vector3f localTranslation = new Vector3f(position.x() * 0.5f, position.y(), unEvenTranslation * position.z() + (unEven ? unEvenTranslation : 0));
         Quaternion rotateIfUnEven = new Quaternion();
-        rotateIfUnEven.fromAngleAxis(unEven ? FastMath.PI : 0, new Vector3f(0, 1, 0));
-
+          rotateIfUnEven.fromAngleAxis(unEven?  FastMath.PI : 0, new Vector3f(0,1,0));
 
         final float basicRotation = FastMath.PI / 2f;
         final float resize = (float) Math.sqrt(1d / 3d);

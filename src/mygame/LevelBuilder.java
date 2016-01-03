@@ -3,7 +3,7 @@ package mygame;
 import mygame.math.HexaHelper;
 import mygame.math.HexaDirection;
 import mygame.math.Vector3;
-import mygame.blocktrianglefield.SingleBlockTriangleField;
+import mygame.blocktrianglefield.SingleMeshTriangleField;
 import mygame.blocktrianglefield.TriangleBlock;
 import mygame.blocktrianglefield.MultiBlockTriangleField;
 import com.jme3.asset.AssetManager;
@@ -17,48 +17,48 @@ public class LevelBuilder {
 
     public void setUpLevel(Node rootNode, AssetManager assetManager, PhysicsSpace space) {
         int radius = 32;
-        SingleBlockTriangleField tField;
+        SingleMeshTriangleField tField;
         Random r = new Random();
+        
         tField = setUpRoomBlocks(assetManager, space, radius, r);
+        setUpUglyAxisInSky(tField,r);
         rootNode.attachChild(tField.getField());
+        
         SetUpMovementBlocks(rootNode, assetManager, space);
-        setUpUglyAxisInSky(tField, r);
         tField.setActive(true);
     }
 
     private void SetUpMovementBlocks(Node rootNode, AssetManager assetManager, PhysicsSpace space) {
         MultiBlockTriangleField field = new MultiBlockTriangleField(assetManager, space);
         rootNode.attachChild(field.getField());
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 1; i++) {
             for (int j = 0; j < 1; j++) {
                 field.setBlock(new TriangleBlock(new Vector3(j, 1, i), new Vector4f(1f, 1f, 1f, 1f)));
             }
         }
-        field.getField().setLocalTranslation(0f, 1f, 0f);
     }
 
-    private void setUpUglyAxisInSky(SingleBlockTriangleField tField, Random r) {
+    private void setUpUglyAxisInSky(SingleMeshTriangleField tField, Random r) {
         int height = 3;
 
-        tField.setBlock(new TriangleBlock(new Vector3(0, height-1, 0), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
         tField.setBlock(new TriangleBlock(new Vector3(0, height, 0), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
         tField.setBlock(new TriangleBlock(new Vector3(1, height, 0), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
         tField.setBlock(new TriangleBlock(new Vector3(2, height, 0), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
         tField.setBlock(new TriangleBlock(new Vector3(3, height, 0), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
         tField.setBlock(new TriangleBlock(new Vector3(4, height, 0), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
-        tField.setBlock(new TriangleBlock(new Vector3(0, height, 1), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
-        tField.setBlock(new TriangleBlock(new Vector3(0, height, 2), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
+        //tField.setBlock(new TriangleBlock(new Vector3(0, height, 1), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
+        //tField.setBlock(new TriangleBlock(new Vector3(0, height, 2), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
     }
 
     private Vector4f getColor(Vector3 position) {
         //return new Vector4f(FastMath.cos((2 * position.x + (position.y + position.z)) / 10), FastMath.cos((2 * position.x - (position.y + position.z)) / 10), FastMath.cos((position.y + position.z) / 10), 1f);
-        return new Vector4f(FastMath.cos((2*position.x+(position.y + position.z))),FastMath.cos((2*position.x-(position.y + position.z))),FastMath.cos((position.y + position.z)),1f);
+        return new Vector4f(FastMath.cos((2 * position.x + (position.y + position.z))), FastMath.cos((2 * position.x - (position.y + position.z))), FastMath.cos((position.y + position.z)), 1f);
 
     }
 
-    private SingleBlockTriangleField setUpRoomBlocks(AssetManager assetManager, PhysicsSpace space, int radius, Random r) {
-        SingleBlockTriangleField tField;
-        tField = new SingleBlockTriangleField(assetManager, space);
+    private SingleMeshTriangleField setUpRoomBlocks(AssetManager assetManager, PhysicsSpace space, int radius, Random r) {
+        SingleMeshTriangleField tField;
+        tField = new SingleMeshTriangleField(assetManager, space);
         int firstLevel = 8;
         int secondLevel = 12;
         int thirdLevel = 16;
@@ -84,7 +84,7 @@ public class LevelBuilder {
         return tField;
     }
 
-    private void putDoorInHexagon(int radius, SingleBlockTriangleField tField, Vector3 beginPosition, HexaDirection direction) {
+    private void putDoorInHexagon(int radius, SingleMeshTriangleField tField, Vector3 beginPosition, HexaDirection direction) {
         if (direction == HexaDirection.ZPlus || direction == HexaDirection.ZMinLeft || direction == HexaDirection.ZPlusLeft) {
             radius -= 1;
         }
@@ -109,7 +109,7 @@ public class LevelBuilder {
         tField.removeBlock(updatedPosition.add(-2, 0, 0));
     }
 
-    private void setHollowHexagon(int radius, SingleBlockTriangleField tField, Vector3 beginPosition, Random r) {
+    private void setHollowHexagon(int radius, SingleMeshTriangleField tField, Vector3 beginPosition, Random r) {
 
         for (int x = -2 * radius; x <= 2 * radius; x += 1) {
             for (int z = -radius; z < radius; z += 1) {
@@ -135,7 +135,7 @@ public class LevelBuilder {
 
     }
 
-    private void setFilledHexagon(int radius, SingleBlockTriangleField tField, Vector3 beginPosition, Random r) {
+    private void setFilledHexagon(int radius, SingleMeshTriangleField tField, Vector3 beginPosition, Random r) {
         for (int x = -2 * radius; x <= 2 * radius; x += 1) {
             for (int z = -radius; z < radius; z += 1) {
                 if (z < -radius || z > radius - 1) {
