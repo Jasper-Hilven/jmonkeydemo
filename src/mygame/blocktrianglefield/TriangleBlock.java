@@ -1,6 +1,7 @@
-package mygame;
+package mygame.blocktrianglefield;
 
 import com.jme3.math.Vector4f;
+import mygame.math.Vector3;
 
 public class TriangleBlock {
 

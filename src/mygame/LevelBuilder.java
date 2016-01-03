@@ -1,5 +1,11 @@
 package mygame;
 
+import mygame.math.HexaHelper;
+import mygame.math.HexaDirection;
+import mygame.math.Vector3;
+import mygame.blocktrianglefield.SingleBlockTriangleField;
+import mygame.blocktrianglefield.TriangleBlock;
+import mygame.blocktrianglefield.MultiBlockTriangleField;
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.math.FastMath;
@@ -25,7 +31,7 @@ public class LevelBuilder {
         rootNode.attachChild(field.getField());
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 1; j++) {
-                field.setBlock(new TriangleBlock(new Vector3(j, 0, i), new Vector4f(1f, 1f, 1f, 1f)));
+                field.setBlock(new TriangleBlock(new Vector3(j, 1, i), new Vector4f(1f, 1f, 1f, 1f)));
             }
         }
         field.getField().setLocalTranslation(0f, 1f, 0f);

@@ -1,4 +1,4 @@
-package mygame;
+package mygame.blocktrianglefield;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.bullet.PhysicsSpace;
@@ -17,6 +17,7 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.control.Control;
 import com.jme3.util.BufferUtils;
 import java.util.HashMap;
+import mygame.math.Vector3;
 
 public class MultiBlockTriangleField implements BlockTriangleField {
 
@@ -130,23 +131,6 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         redBlockMaterial = BlockTriangleFieldHelper.getColoredBlockMaterial(assetManager, ColorRGBA.Red);
     }
 
-    public void setBlock(TriangleBlock tBlock) {
-        Vector3 position = tBlock.getPosition();
-        if (!position.isPositive()) {
-            throw new Error();
-        }
-        Geometry block = blocks.get(position);
-        if (block != null) {
-            return;
-        }
-        boolean even = position.isEvenXZ();
-        block = GetSingleBlock(even, getBlockName(position));
-        PutBlockInPlace(position, block);
-        field.attachChild(block);
-        blocks.put(position, block);
-        AddPhysics(block);
-    }
-
     private String getBlockName(Vector3 position) {
         return position.toString();
     }
@@ -164,6 +148,45 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         removePhysics(block);
     }
 
+    public void setExistingBlock(Vector3 position, Spatial block){
+        if(block.getParent() != null)
+            throw new Error();
+        field.attachChild(block);
+        RigidBodyControl physicsBlock = block.getControl(RigidBodyControl.class);
+        if(physicsBlock.getMass() != 0)
+          physicsBlock.setMass(0f);
+    }
+    
+    public Spatial takeBlock(Vector3 position){
+      Geometry block = blocks.get(position);
+      if(block == null)
+          return null;
+      blocks.remove(position);
+      field.detachChild(block);
+      return block;
+    }
+    
+    public void setActive(boolean active) {
+    }
+
+    public void setBlock(TriangleBlock tBlock) {
+        Vector3 position = tBlock.getPosition();
+        if (!position.isPositive()) {
+            throw new Error();
+        }
+        Geometry block = blocks.get(position);
+        if (block != null) {
+            return;
+        }
+        boolean even = position.isEvenXZ();
+        block = GetSingleBlock(even, getBlockName(position));
+        PutBlockInPlace(position, block);
+        field.attachChild(block);
+        blocks.put(position, block);
+        AddPhysics(block);
+    }
+
+    
     private void PutBlockInPlace(Vector3 position, Geometry geo) {
         int x = position.x();
         int y = position.y();
@@ -192,9 +215,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         world.remove(physicsBlock);
     }
 
-    public void setActive(boolean active) {
-    }
-
+    
     private Geometry GetSingleBlock(boolean red, String name) {
         Geometry geo = new Geometry(name, singleBlockMesh);
         geo.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);

@@ -1,4 +1,4 @@
-package mygame;
+package mygame.math;
 //Looking to the Z axis, X axis is left, top down.
 
 public enum HexaDirection implements IHexaDirection {

@@ -1,9 +1,9 @@
-package mygame;
+package mygame.math;
 
-import static mygame.HexaDirection.ZMin;
-import static mygame.HexaDirection.ZPlus;
-import static mygame.HexaDirection.ZPlusLeft;
-import static mygame.HexaDirection.ZPlusRight;
+import static mygame.math.HexaDirection.ZMin;
+import static mygame.math.HexaDirection.ZPlus;
+import static mygame.math.HexaDirection.ZPlusLeft;
+import static mygame.math.HexaDirection.ZPlusRight;
 
 
 public class HexaHelper{

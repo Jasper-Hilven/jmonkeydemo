@@ -1,4 +1,4 @@
-package mygame;
+package mygame.blocktrianglefield;
 
 import com.jme3.asset.AssetManager;
 import com.jme3.material.Material;
