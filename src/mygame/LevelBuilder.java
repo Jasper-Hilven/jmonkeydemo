@@ -31,15 +31,16 @@ public class LevelBuilder {
     private void SetUpMovementBlocks(Node rootNode, AssetManager assetManager, PhysicsSpace space) {
         MultiBlockTriangleField field = new MultiBlockTriangleField(assetManager, space);
         rootNode.attachChild(field.getField());
-        for (int i = 0; i < 1; i++) {
-            for (int j = 0; j < 1; j++) {
-                field.setBlock(new TriangleBlock(new Vector3(j, 1, i), new Vector4f(1f, 1f, 1f, 1f)));
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                Vector3 position = new Vector3(j, 1, i);
+                field.setBlock(new TriangleBlock(position, getColor(position)));
             }
         }
     }
 
     private void setUpUglyAxisInSky(SingleMeshTriangleField tField, Random r) {
-        int height = 3;
+        int height = 2;
 
         tField.setBlock(new TriangleBlock(new Vector3(0, height, 0), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
         tField.setBlock(new TriangleBlock(new Vector3(1, height, 0), new Vector4f(r.nextFloat(), 0.5f, r.nextFloat(), 1)));
@@ -51,8 +52,8 @@ public class LevelBuilder {
     }
 
     private Vector4f getColor(Vector3 position) {
-        //return new Vector4f(FastMath.cos((2 * position.x + (position.y + position.z)) / 10), FastMath.cos((2 * position.x - (position.y + position.z)) / 10), FastMath.cos((position.y + position.z) / 10), 1f);
-        return new Vector4f(FastMath.cos((2 * position.x + (position.y + position.z))), FastMath.cos((2 * position.x - (position.y + position.z))), FastMath.cos((position.y + position.z)), 1f);
+        return new Vector4f(FastMath.cos((2 * position.x + (position.y + position.z)) / 10), FastMath.cos((2 * position.x - (position.y + position.z)) / 10), FastMath.cos((position.y + position.z) / 10), 1f);
+        //return new Vector4f(FastMath.cos((2 * position.x + (position.y + position.z))), FastMath.cos((2 * position.x - (position.y + position.z))), FastMath.cos((position.y + position.z)), 1f);
 
     }
 
@@ -69,10 +70,10 @@ public class LevelBuilder {
         setFilledHexagon(radius, tField, beginPosition, r);
         setFilledHexagon(radius, tField, beginPosition.add(new Vector3(0, ceilingHeight, 0)), r);
         for (int i = 1; i < ceilingHeight; i++) {
-            //setHollowHexagon(firstLevel, tField, beginPosition.add(new Vector3(0, i, 0)), r);
-            //setHollowHexagon(secondLevel, tField, beginPosition.add(new Vector3(0, i, 0)), r);
-            //setHollowHexagon(thirdLevel, tField, beginPosition.add(new Vector3(0, i, 0)), r);
-            //setHollowHexagon(fourthLevel, tField, beginPosition.add(new Vector3(0, i, 0)), r);
+            setHollowHexagon(firstLevel, tField, beginPosition.add(new Vector3(0, i, 0)), r);
+            setHollowHexagon(secondLevel, tField, beginPosition.add(new Vector3(0, i, 0)), r);
+            setHollowHexagon(thirdLevel, tField, beginPosition.add(new Vector3(0, i, 0)), r);
+            setHollowHexagon(fourthLevel, tField, beginPosition.add(new Vector3(0, i, 0)), r);
             setHollowHexagon(outRadius, tField, beginPosition.add(new Vector3(0, i, 0)), r);
             putDoorInHexagon(fourthLevel, tField, beginPosition.add(new Vector3(0, i, 0)), HexaDirection.ZMinRight);
             putDoorInHexagon(secondLevel, tField, beginPosition.add(new Vector3(0, i, 0)), HexaDirection.ZMin);

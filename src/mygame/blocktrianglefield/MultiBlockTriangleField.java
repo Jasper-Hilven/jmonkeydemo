@@ -4,10 +4,9 @@ import com.jme3.asset.AssetManager;
 import com.jme3.bullet.PhysicsSpace;
 import com.jme3.bullet.control.RigidBodyControl;
 import com.jme3.material.Material;
-import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector3f;
+import com.jme3.math.Vector4f;
 import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
@@ -17,17 +16,15 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.scene.control.Control;
 import com.jme3.util.BufferUtils;
 import java.util.HashMap;
-import javax.vecmath.Matrix3d;
 import mygame.TurningBlockController;
 import mygame.math.Vector3;
 
 public class MultiBlockTriangleField implements BlockTriangleField {
 
     private HashMap<Vector3, Spatial> blocks;
+    private HashMap<Vector4f, Mesh> coloredBlocks;
     private Node field;
-    private Mesh singleBlockMesh;
-    private Material blueBlockMaterial;
-    private Material redBlockMaterial;
+    private Material blockMaterial;
     private PhysicsSpace world;
 
     public Spatial getField() {
@@ -38,13 +35,12 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         blocks = new HashMap<Vector3, Spatial>();
         field = new Node();
         field.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        setSingleBlockMesh();
-        setBlueBlockMaterial(assetManager);
-        setRedBlockMaterial(assetManager);
+        blockMaterial = BlockTriangleFieldHelper.getVertexColoredBlockMaterial(assetManager);
         this.world = physics;
+        coloredBlocks = new HashMap<Vector4f, Mesh>();
     }
 
-    private void setSingleBlockMesh() {
+    private Mesh getSingleBlockMesh(Vector4f color) {
         Mesh mesh = new Mesh();
         float basicRotation = FastMath.PI / 2f;
         float resize = (float) Math.sqrt(1d / 3d);
@@ -58,6 +54,10 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         float y1 = 1f / resize;
         Vector3f[] vertices = new Vector3f[18];
         Vector3f[] normals = new Vector3f[18];
+        Vector4f[] colors = new Vector4f[18];
+        for (int i = 0; i < 18; i++) {
+            colors[i] = color;
+        }
         final Vector3f p0 = new Vector3f(x1, y0, z1).mult(resize);
         final Vector3f p1 = new Vector3f(x0, y0, z0).mult(resize);
         final Vector3f p2 = new Vector3f(x2, y0, z2).mult(resize);
@@ -69,6 +69,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         final Vector3f nFirst = p0.add(p1).divide(2f).subtract(p2).normalize();
         final Vector3f nSecond = p2.add(p0).divide(2f).subtract(p1).normalize();
         final Vector3f nThird = p1.add(p2).divide(2f).subtract(p0).normalize();
+
         //Lower triangle
         vertices[0] = p0;
         vertices[1] = p1;
@@ -76,8 +77,8 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         normals[0] = nDown;
         normals[1] = nDown;
         normals[2] = nDown;
+        
         //Upper triangle
-
         vertices[3] = p3;
         vertices[4] = p4;
         vertices[5] = p5;
@@ -85,8 +86,6 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         normals[4] = nUp;
         normals[5] = nUp;
 
-
-        //First square
         vertices[6] = p1;
         vertices[7] = p4;
         vertices[8] = p0;
@@ -95,7 +94,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         normals[7] = nFirst;
         normals[8] = nFirst;
         normals[9] = nFirst;
-        //second square
+
         vertices[10] = p0;
         vertices[11] = p3;
         vertices[12] = p2;
@@ -105,7 +104,6 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         normals[12] = nSecond;
         normals[13] = nSecond;
 
-        //Third square
         vertices[14] = p2;
         vertices[15] = p5;
         vertices[16] = p1;
@@ -118,18 +116,10 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         int[] indexes = {2, 1, 0, 3, 4, 5, 6, 7, 8, 8, 7, 9, 10, 11, 12, 12, 11, 13, 14, 15, 16, 16, 15, 17};
         mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertices));
         mesh.setBuffer(VertexBuffer.Type.Normal, 3, BufferUtils.createFloatBuffer(normals));
-        //mesh.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(texCoord));
+        mesh.setBuffer(VertexBuffer.Type.Color, 4, BufferUtils.createFloatBuffer(colors));
         mesh.setBuffer(VertexBuffer.Type.Index, 3, BufferUtils.createIntBuffer(indexes));
         mesh.updateBound();
-        singleBlockMesh = mesh;
-    }
-
-    private void setBlueBlockMaterial(AssetManager assetManager) {
-        blueBlockMaterial = BlockTriangleFieldHelper.getColoredBlockMaterial(assetManager, ColorRGBA.Blue);
-    }
-
-    private void setRedBlockMaterial(AssetManager assetManager) {
-        redBlockMaterial = BlockTriangleFieldHelper.getColoredBlockMaterial(assetManager, ColorRGBA.Red);
+        return mesh;
     }
 
     private String getBlockName(Vector3 position) {
@@ -175,7 +165,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         field.detachChild(block);
         return block;
     }
-    
+
     public void setActive(boolean active) {
     }
 
@@ -189,12 +179,12 @@ public class MultiBlockTriangleField implements BlockTriangleField {
             return;
         }
         boolean even = position.isEvenXZ();
-        block = GetSingleBlock(even, getBlockName(position));
+        block = GetSingleBlock(even, getBlockName(position), tBlock.getColor());
         PutBlockInPlace(position, block);
         field.attachChild(block);
         blocks.put(position, block);
         AddPhysics(block);
-        //block.addControl(new TurningBlockController());
+        block.addControl(new TurningBlockController());
     }
 
     private void PutBlockInPlace(Vector3 position, Spatial geo) {
@@ -217,10 +207,19 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         world.remove(physicsBlock);
     }
 
-    private Geometry GetSingleBlock(boolean red, String name) {
-        Geometry geo = new Geometry(name, singleBlockMesh);
+    private Mesh GetColoredBlock(Vector4f color) {
+        Mesh block = coloredBlocks.get(color);
+        if (block == null) {
+            block = getSingleBlockMesh(color);
+            coloredBlocks.put(color, block);
+        }
+        return block;
+    }
+
+    private Geometry GetSingleBlock(boolean red, String name, Vector4f color) {
+        Geometry geo = new Geometry(name, GetColoredBlock(color));
         geo.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
-        geo.setMaterial(red ? redBlockMaterial : blueBlockMaterial);
+        geo.setMaterial(blockMaterial);
         return geo;
     }
 }

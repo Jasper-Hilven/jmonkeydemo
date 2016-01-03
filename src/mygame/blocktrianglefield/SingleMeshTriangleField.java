@@ -31,7 +31,7 @@ public class SingleMeshTriangleField implements BlockTriangleField {
     private Geometry latestBlocks;
 
     public SingleMeshTriangleField(AssetManager assetManager, PhysicsSpace physics) {
-        this.mat = BlockTriangleFieldHelper.getVertexColoredBlockMaterial(assetManager, ColorRGBA.Yellow);
+        this.mat = BlockTriangleFieldHelper.getVertexColoredBlockMaterial(assetManager);
         this.physics = physics;
         positionToBlock = new HashMap<Vector3, TriangleBlock>();
         attachPoint = new Node();
@@ -140,9 +140,8 @@ public class SingleMeshTriangleField implements BlockTriangleField {
         normals[normalBase + 4] = nUp;
         normals[normalBase + 5] = nUp;
 
-        for (int i = 0; i < 18; i++) {
+        for (int i = 0; i < 18; i++) 
             colors[vertexBase + i] = color;
-        }
 
         //First square
         vertices[vertexBase + 6] = p1;
