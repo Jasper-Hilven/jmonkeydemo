@@ -2,15 +2,16 @@ package mygame;
 
 import com.jme3.math.Vector4f;
 
-public class TriangleBlock{
-  private Vector3 position;
-  private Vector4f color;
+public class TriangleBlock {
 
-  public TriangleBlock(Vector3 position, Vector4f color){
-    this.position = position;
-    this.color = color;
-  }
-  
+    private Vector3 position;
+    private Vector4f color;
+
+    public TriangleBlock(Vector3 position, Vector4f color) {
+        this.position = position;
+        this.color = color;
+    }
+
     /**
      * @return the position
      */
@@ -38,8 +39,4 @@ public class TriangleBlock{
     public void setColor(Vector4f color) {
         this.color = color;
     }
-
-  
-
-
 }
