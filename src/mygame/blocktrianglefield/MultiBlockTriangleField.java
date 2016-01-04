@@ -77,7 +77,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         normals[0] = nDown;
         normals[1] = nDown;
         normals[2] = nDown;
-        
+
         //Upper triangle
         vertices[3] = p3;
         vertices[4] = p4;
@@ -184,7 +184,6 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         field.attachChild(block);
         blocks.put(position, block);
         AddPhysics(block);
-        block.addControl(new TurningBlockController());
     }
 
     private void PutBlockInPlace(Vector3 position, Spatial geo) {
@@ -220,6 +219,7 @@ public class MultiBlockTriangleField implements BlockTriangleField {
         Geometry geo = new Geometry(name, GetColoredBlock(color));
         geo.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         geo.setMaterial(blockMaterial);
+        //geo.addControl(new TurningBlockController());
         return geo;
     }
 }

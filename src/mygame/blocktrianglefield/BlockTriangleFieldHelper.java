@@ -32,18 +32,20 @@ public class BlockTriangleFieldHelper {
     
     public static Vector3 getNearestBlockPosition(Vector3f worldPosition){
         int y = Math.round(worldPosition.y);
-        int x = Math.round(worldPosition.x*2f);
-        throw new Error();
+        int x = Math.round(worldPosition.x/xTranslation);
+        int nearestZApproximation = Math.round((worldPosition.z -unEvenTranslation/2f)/ zTranslation);
+        return new Vector3(x, y, nearestZApproximation);
     }
     
+    private static float zTranslation = 1.5f/FastMath.sqrt(3);
+    private static float unEvenTranslation = - 0.5f/FastMath.sqrt(3);
+    private static float xTranslation = 0.5f;
     
     public static Vector3f getWorldPosition(Vector3 position) {
         int x = position.x();
         int y = position.y();
         int z = position.z();
-        float unEvenTranslation = - 0.5f/FastMath.sqrt(3);
-        float zTranslation = 1.5f/FastMath.sqrt(3);
-        float xTranslation = 0.5f;
+        
         boolean unEven = !position.isEvenXZ();
         Vector3f localTranslation = new Vector3f(x * xTranslation, y, zTranslation * z + (unEven ? unEvenTranslation : 0));
         return localTranslation;
