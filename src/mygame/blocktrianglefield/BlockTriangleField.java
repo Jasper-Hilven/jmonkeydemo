@@ -13,11 +13,11 @@ import mygame.math.Vector3;
  */
 public interface BlockTriangleField {
 
-    Spatial getField();
+  Spatial getField();
 
-    void setBlock(TriangleBlock position);
+  void setBlock(TriangleBlockDescription position);
 
-    void removeBlock(Vector3 position);
+  void removeBlock(Vector3 position);
 
-    void setActive(boolean active);
+  void setActive(boolean active);
 }

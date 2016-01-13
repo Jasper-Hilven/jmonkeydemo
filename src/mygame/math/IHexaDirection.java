@@ -8,9 +8,11 @@ package mygame.math;
  *
  * @author Jasper
  */
-public interface IHexaDirection{
-    boolean isUp();
-    IHexaDirection goTwoClockWise();
-    IHexaDirection goTwoCounterClockWise();
+public interface IHexaDirection {
 
+  boolean isUp();
+
+  IHexaDirection goTwoClockWise();
+
+  IHexaDirection goTwoCounterClockWise();
 }
